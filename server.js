@@ -9,69 +9,74 @@ require('dotenv').config()
 // =============================================================
 var app = express();
 var PORT = process.env.PORT;
-//var PORT = 3010;
 
-// Sets up the Express app to handle data parsing
+//var app = express();
+//var PORT = 7000;
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-var customer = [
-    {
-    customerName: "test",
-    phoneNumber: "123456",
-    customerEmail: "abc123@gmail.com",
-    customerID: "1"
-    }
-    ];
 
-// Basic route that sends the user first to the AJAX Page
-app.get("/", function (req, res) {
+var tables = [];
+var waitlist = [];
+
+  
+  app.get("/", function(req, res) {
     res.sendFile(path.join(__dirname, "home.html"));
   });
   
-  app.get("/add", function (req, res) {
-    res.sendFile(path.join(__dirname, "add.html"));
+  app.get("/reserve", function(req, res) {
+    res.sendFile(path.join(__dirname, "reserve.html"));
   });
-  
-  // Displays all tables
-  app.get("/api/tables", function (req, res) {
-    return res.json(customer);
-  });
-  
-  // Displays a , or returns false
-  app.get("/api/customer/:character", function (req, res) {
-    var chosen = req.params.character;
-  
-    console.log(chosen);
-  
-    for (var i = 0; i < customer.length; i++) {
-      if (chosen === customer[i].routeName) {
-        return res.json(customer[i]);
-      }
-    }
-  
-    return res.json(false);
+   
+  app.get("/tables", function(req, res) {
+    res.sendFile(path.join(__dirname, "tables.html"));
   });
 
-  // Create New customer - takes in JSON input
-app.post("/api/customer", function (req, res) {
+  app.get("/api/tables", function(req, res) {
+    return res.json(tables);
+  });
 
-    var newcharacter = req.body;
+  app.get("/api/waitlist", function(req, res) {
+    return res.json(waitlist);
+  });
+
+  app.post("/api/clear", function(req, res) {
+tables = [];
+waitlist = [];
+
+res.sendStatus(200);
+
+  });
+
+  app.post("/api/tables", function(req, res) {
+    // req.body hosts is equal to the JSON post sent from the user
+    // This works because of our body parsing middleware
+    var newReservation = req.body;
   
     // Using a RegEx Pattern to remove spaces from newCharacter
     // You can read more about RegEx Patterns later https://www.regexbuddy.com/regex.html
-    newcharacter.routeName = newcharacter.name.replace(/\s+/g, "").toLowerCase();
+    //newcharacter.routeName = newcharacter.name.replace(/\s+/g, "").toLowerCase();
   
-    console.log(newcharacter);
+    console.log(newReservation);
+
+    
+  if(tables.length < 5){
+    tables.push(newReservation);
+    res.json(newReservation);
+  }
+  else{
+    res.json(false);
+    waitlist.push(newReservation);
+  }
   
-    customer.push(newcharacter);
-  
-    res.json(newcharacter);
+    
   });
+  
+  
   
   // Starts the server to begin listening
   // =============================================================
-  app.listen(PORT, function () {
+  app.listen(PORT, function() {
     console.log("App listening on PORT " + PORT);
   });
-  
-
