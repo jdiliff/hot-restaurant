@@ -54,8 +54,7 @@ app.get("/", function (req, res) {
 
   // Create New customer - takes in JSON input
 app.post("/api/customer", function (req, res) {
-    // req.body hosts is equal to the JSON post sent from the user
-    // This works because of our body parsing middleware
+
     var newcharacter = req.body;
   
     // Using a RegEx Pattern to remove spaces from newCharacter
